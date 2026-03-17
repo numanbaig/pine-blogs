@@ -1,4 +1,15 @@
-from pydantic import BaseModel, Field
+import uuid
+from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class UserResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    email: str
+    created_at: datetime
 
 
 class SignupRequest(BaseModel):
