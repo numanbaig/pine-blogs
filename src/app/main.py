@@ -1,11 +1,13 @@
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.routes.auth import router as auth_router
 from app.api.routes.blogs import router as blogs_router
+from app.core.config import settings
 from app.db.database import Base, engine, get_db
 from app.models.blogs import Blog  # noqa: F401 - register model with Base
 from app.models.user import User  # noqa: F401 - register model with Base
@@ -19,6 +21,15 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+origins = [o.strip() for o in settings.CORS_ORIGINS.split(",")] if settings.CORS_ORIGINS != "*" else ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=origins != ["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(blogs_router, prefix="/blogs", tags=["blogs"])
 

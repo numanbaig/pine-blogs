@@ -1,15 +1,11 @@
-import os
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    f"postgresql+asyncpg://{os.getenv('USER', 'postgres')}@localhost:5432/pine-blogs",
-)
+from app.core.config import settings
 
 engine = create_async_engine(
-    DATABASE_URL,
-    echo=os.getenv("SQL_ECHO", "false").lower() == "true",
+    settings.DATABASE_URL,
+    echo=settings.SQL_ECHO,
 )
 
 async_session_maker = async_sessionmaker(
@@ -23,7 +19,6 @@ async_session_maker = async_sessionmaker(
 
 class Base(DeclarativeBase):
     pass
-
 
 async def get_db() -> AsyncSession:
     async with async_session_maker() as session:
